@@ -8,6 +8,46 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SlackApp {
+	
+	// If you would like to run this app for a single workspace,
+    // enabling this Bean factory should work for you.
+    @Bean
+    public AppConfig loadSingleWorkspaceAppConfig() {
+        return AppConfig.builder()
+                .singleTeamBotToken("xoxb-2223272623701-2250287659856-AqJQUi57o6lIwbe6HEKKly5m")
+                .signingSecret("1527fbc65613253825740062dcd8ba61")
+                .build();
+    }
+
+    // If you would like to run this app for multiple workspaces,
+    // enabling this Bean factory should work for you.
+    // @Bean
+    public AppConfig loadOAuthConfig() {
+        return AppConfig.builder()
+                .singleTeamBotToken(null)
+                .clientId("2223272623701.2226569658002")
+                .clientSecret("66587b612400da337651e8eb9a94b285")
+                .signingSecret("1527fbc65613253825740062dcd8ba61")
+                .scope("app_mentions:read,channels:history,channels:read,chat:write")
+                .oauthInstallPath("/slack/install")
+                .oauthRedirectUriPath("/slack/oauth_redirect")
+                .build();
+    }
+    
+ 
+    @Bean
+    public App initSlackApp(AppConfig config) {
+        App app = new App(config);
+        if (config.getClientId() != null) {
+            app.asOAuthApp(true);
+        }
+        app.command("/meeting", (req, ctx) -> {
+            return ctx.ack(r -> r.text("Thanks!"));
+        });
+        return app;
+    }
+	
+	
 	@Bean
 	public App initSlackApp() {
 		String botToken = "xoxb-2223272623701-2250287659856-pWjnN0KxCRyIDtBW1GXkaxLm";
